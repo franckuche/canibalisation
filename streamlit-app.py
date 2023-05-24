@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 
 st.title("Analyseur de données SEO")
 
@@ -15,26 +16,20 @@ if uploaded_file is not None:
     # Conversion de la colonne 'CTR' en décimal, après avoir supprimé le signe '%'
     data['CTR'] = pd.to_numeric(data['CTR'].str.replace('%', ''), errors='coerce') / 100
 
-    # Vérification de l'existence des colonnes requises
-    if set(['Query', 'Page', 'Clicks', 'Impressions', 'CTR', 'Position']).issubset(data.columns):
+    # Ajout d'une nouvelle colonne 'Lang' pour identifier la langue de la page
+    data['Lang'] = pd.np.where(data['Page'].str.contains("/fr/"), "FR",
+                    pd.np.where(data['Page'].str.contains("/en/"), "EN", "Unknown"))
 
-        # Groupement des données par Query et Page
-        grouped_data = data.groupby(['Query', 'Page']).agg({'Clicks': 'sum', 'Impressions': 'sum', 'Position': 'mean'}).reset_index()
+    # Affichage du nombre de pages par langue
+    st.subheader("Nombre de pages par langue")
+    fig, ax = plt.subplots()
+    data['Lang'].value_counts().plot(kind='bar', ax=ax)
+    st.pyplot(fig)
 
-        # Suppression des mots-clés ayant un match avec une seule page
-        counts = grouped_data['Query'].value_counts()
-        multiple_pages = counts[counts > 1].index
-        filtered_data = grouped_data[grouped_data['Query'].isin(multiple_pages)]
-
-        # Affichage des résultats
-        st.write(filtered_data)
-
-        # Téléchargement des résultats
-        csv = filtered_data.to_csv(index=False, encoding="utf-8")
-        st.download_button(label="Télécharger le CSV", data=csv, file_name="analyse_seo.csv", mime="text/csv")
-
-    else:
-        st.error("Le fichier CSV fourni ne contient pas toutes les colonnes nécessaires ('Query', 'Page', 'Clicks', 'Impressions', 'CTR', 'Position')")
+    # Affichage des mots-clés qui rankent à la fois en français et en anglais
+    st.subheader("Mots-clés qui rankent à la fois en français et en anglais")
+    keywords_fr_en = data[data['Lang'].isin(['FR', 'EN'])]['Query'].value_counts()
+    st.write(keywords_fr_en[keywords_fr_en > 1])
 
 else:
     st.warning("Veuillez uploader un fichier CSV.")
