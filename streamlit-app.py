@@ -13,7 +13,7 @@ if uploaded_file is not None:
     data['Impressions'] = data['Impressions'].str.replace('\u202f', '').astype(int)
 
     # Conversion de la colonne 'CTR' en décimal, après avoir supprimé le signe '%'
-    data['CTR'] = data['CTR'].str.replace('%', '').astype(float) / 100
+    data['CTR'] = pd.to_numeric(data['CTR'].str.replace('%', ''), errors='coerce') / 100
 
     # Vérification de l'existence des colonnes requises
     if set(['Query', 'Page', 'Clicks', 'Impressions', 'CTR', 'Position']).issubset(data.columns):
