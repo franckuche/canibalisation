@@ -17,8 +17,9 @@ if uploaded_file is not None:
     data['CTR'] = pd.to_numeric(data['CTR'].str.replace('%', ''), errors='coerce') / 100
 
     # Ajout d'une nouvelle colonne 'Lang' pour identifier la langue de la page
-    data['Lang'] = pd.np.where(data['Page'].str.contains("/fr/"), "FR",
-                    pd.np.where(data['Page'].str.contains("/en/"), "EN", "Unknown"))
+    data['Lang'] = np.where(data['Page'].str.contains("/fr/"), "FR",
+                        np.where(data['Page'].str.contains("/en/"), "EN", "Autre"))
+
 
     # Affichage du nombre de pages par langue
     st.subheader("Nombre de pages par langue")
