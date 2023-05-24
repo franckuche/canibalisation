@@ -7,10 +7,13 @@ uploaded_file = st.file_uploader("Veuillez envoyer votre fichier CSV", type=['cs
 
 if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
-    
+
+    # Conversion de la colonne 'Position' en numérique
+    data['Position'] = pd.to_numeric(data['Position'], errors='coerce')
+
     # Vérification de l'existence des colonnes requises
     if set(['Query', 'Page', 'Clicks', 'Impressions', 'CTR', 'Position']).issubset(data.columns):
-        
+
         # Groupement des données par Query et Page
         grouped_data = data.groupby(['Query', 'Page']).agg({'Clicks': 'sum', 'Impressions': 'sum', 'Position': 'mean'}).reset_index()
 
