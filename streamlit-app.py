@@ -6,10 +6,14 @@ st.title("Analyseur de données SEO")
 uploaded_file = st.file_uploader("Veuillez envoyer votre fichier CSV", type=['csv'])
 
 if uploaded_file is not None:
-    data = pd.read_csv(uploaded_file)
+    data = pd.read_csv(uploaded_file, thousands=' ', decimal=',')
+    
+    # Conversion des colonnes 'Clicks' et 'Impressions' en entiers
+    data['Clicks'] = data['Clicks'].str.replace('\u202f', '').astype(int)
+    data['Impressions'] = data['Impressions'].str.replace('\u202f', '').astype(int)
 
-    # Conversion de la colonne 'Position' en numérique
-    data['Position'] = pd.to_numeric(data['Position'], errors='coerce')
+    # Conversion de la colonne 'CTR' en décimal, après avoir supprimé le signe '%'
+    data['CTR'] = data['CTR'].str.replace('%', '').astype(float) / 100
 
     # Vérification de l'existence des colonnes requises
     if set(['Query', 'Page', 'Clicks', 'Impressions', 'CTR', 'Position']).issubset(data.columns):
