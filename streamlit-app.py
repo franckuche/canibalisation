@@ -23,10 +23,7 @@ if uploaded_file is not None:
     fig, ax = plt.subplots()
     data['Lang'].value_counts().plot(kind='bar', ax=ax)
     st.pyplot(fig)
-    st.subheader("Mots-clés qui rankent à la fois en français et en anglais")
-    keywords_fr_en = data[data['Lang'].isin(['FR', 'EN'])]['Query'].value_counts()
-    st.write(keywords_fr_en[keywords_fr_en > 1])
-
+    
     # Afficher le tableau de données
     st.write(data)
 
@@ -47,6 +44,11 @@ if uploaded_file is not None:
 
     plt.tight_layout()
     st.pyplot(fig)
+
+    # Affichage des URLs avec "/en/" qui ont au moins une impression
+    st.subheader("URLs avec '/en/' ayant au moins une impression")
+    urls_en = data[(data['Lang'] == 'EN') & (data['Impressions'] >= 1)]['Page']
+    st.write(urls_en)
 
 else:
     st.warning("Veuillez uploader un fichier CSV.")
